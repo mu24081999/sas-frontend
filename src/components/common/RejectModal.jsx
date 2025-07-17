@@ -11,6 +11,7 @@ export const RejectModal = ({
   isPending,
   entityName = "Lead",
   entityIdentifier,
+  customRejectionReasons,
 }) => {
   const {
     register,
@@ -28,7 +29,7 @@ export const RejectModal = ({
     onConfirm(data);
   };
 
-  const rejectionReasons = [
+  const defaultRejectionReasons = [
     { value: "incomplete_information", label: "Incomplete Information" },
     { value: "invalid_contact", label: "Invalid Contact Details" },
     { value: "duplicate_lead", label: "Duplicate Lead" },
@@ -36,6 +37,8 @@ export const RejectModal = ({
     { value: "customer_not_interested", label: "Customer Not Interested" },
     { value: "other", label: "Other" },
   ];
+
+  const rejectionReasons = customRejectionReasons || defaultRejectionReasons;
 
   if (!isOpen) return null;
 

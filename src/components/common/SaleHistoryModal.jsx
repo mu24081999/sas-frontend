@@ -8,6 +8,8 @@ import { Input } from "./Input";
 import { Select } from "./Select";
 import { getSaleHistory, addSaleHistory } from "../../api/saleApi";
 import useAuth from "../../hooks/useAuth";
+import { useSidebar } from "../../contexts/SidebarContext";
+import { cn } from "../../utils/cn";
 
 export const SaleHistoryModal = ({
   isOpen,
@@ -17,6 +19,7 @@ export const SaleHistoryModal = ({
 }) => {
   const [activeTab, setActiveTab] = useState("history");
   const { user } = useAuth();
+  const { collapsed, sidebarWidth } = useSidebar();
   const queryClient = useQueryClient();
 
   const {
@@ -106,12 +109,23 @@ export const SaleHistoryModal = ({
   ];
 
   const rejectionOptions = [
-    { value: "incomplete_information", label: "Incomplete Information" },
-    { value: "invalid_contact", label: "Invalid Contact Details" },
-    { value: "duplicate_sale", label: "Duplicate Sale" },
-    { value: "unqualified", label: "Unqualified Sale" },
-    { value: "customer_not_interested", label: "Customer Not Interested" },
-    { value: "other", label: "Other" },
+    { value: "activation_fee_missing", label: "Activation fee missing" },
+    { value: "monthly_charges_missing", label: "Monthly charges missing" },
+    {
+      value: "activation_and_monthly_charges_both_missing",
+      label: "Activation and monthly charges both missing",
+    },
+    { value: "home_warranty_missing", label: "Home warranty missing" },
+    {
+      value: "direct_sale_no_information_verified",
+      label: "Direct sale(no information verified)",
+    },
+    {
+      value: "pushed_sale_confused_customer",
+      label: "Pushed sale ( confused customer )",
+    },
+    { value: "abusive_language", label: "Abusive language" },
+    { value: "electricity_pitch_used", label: "Electricity pitch Used" },
   ];
 
   const getStatusBadge = (status) => {
@@ -162,7 +176,21 @@ export const SaleHistoryModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
+      <div
+        className={cn(
+          "bg-white dark:bg-slate-800 rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col transition-all duration-300",
+          // Position modal to respect sidebar width on desktop
+          "md:ml-4 md:mr-4",
+        )}
+        style={{
+          marginLeft:
+            window.innerWidth >= 768 ? `${sidebarWidth + 16}px` : "16px",
+          maxWidth:
+            window.innerWidth >= 768
+              ? `calc(100vw - ${sidebarWidth + 32}px)`
+              : "calc(100vw - 32px)",
+        }}
+      >
         {/* Header */}
         <div className="p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">

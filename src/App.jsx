@@ -67,6 +67,7 @@
 import { RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
+import { SidebarProvider } from "./contexts/SidebarContext";
 import { router } from "./routes/routes";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider } from "./contexts/theme-context";
@@ -78,8 +79,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider storageKey="theme">
         <AuthProvider>
-          <RouterProvider router={router} />
-          <Toaster position="top-center" />
+          <SidebarProvider>
+            <RouterProvider router={router} />
+            <Toaster position="top-center" />
+          </SidebarProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

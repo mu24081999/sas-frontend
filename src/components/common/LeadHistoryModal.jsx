@@ -455,6 +455,8 @@ import { Input } from "./Input";
 import { Select } from "./Select";
 import { getLeadHistory, addLeadHistory } from "../../api/leadApi";
 import useAuth from "../../hooks/useAuth";
+import { useSidebar } from "../../contexts/SidebarContext";
+import { cn } from "../../utils/cn";
 
 export const LeadHistoryModal = ({
   isOpen,
@@ -464,6 +466,7 @@ export const LeadHistoryModal = ({
 }) => {
   const [activeTab, setActiveTab] = useState("history");
   const { user } = useAuth();
+  const { collapsed, sidebarWidth } = useSidebar();
   const queryClient = useQueryClient();
 
   const {
@@ -620,7 +623,21 @@ export const LeadHistoryModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
+      <div
+        className={cn(
+          "bg-white dark:bg-slate-800 rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col transition-all duration-300",
+          // Position modal to respect sidebar width on desktop
+          "md:ml-4 md:mr-4",
+        )}
+        style={{
+          marginLeft:
+            window.innerWidth >= 768 ? `${sidebarWidth + 16}px` : "16px",
+          maxWidth:
+            window.innerWidth >= 768
+              ? `calc(100vw - ${sidebarWidth + 32}px)`
+              : "calc(100vw - 32px)",
+        }}
+      >
         {/* Header */}
         <div className="p-6 border-b">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -691,7 +708,7 @@ export const LeadHistoryModal = ({
                                   "Unknown User"}
                               </div>
                               {getRoleBadge(
-                                entry?.history?.[0]?.actionBy?.role
+                                entry?.history?.[0]?.actionBy?.role,
                               )}
                             </div>
                             <div className="flex items-center space-x-2">
@@ -714,7 +731,7 @@ export const LeadHistoryModal = ({
                             {entry?.history?.[0]?.timestamp
                               ? format(
                                   new Date(entry?.history?.[0]?.timestamp),
-                                  "PPp"
+                                  "PPp",
                                 )
                               : "Unknown time"}
                           </span>
@@ -744,7 +761,7 @@ export const LeadHistoryModal = ({
                             <strong className="text-red-600">Rejection:</strong>{" "}
                             {entry?.history?.[0]?.rejectionReason.replace(
                               "_",
-                              " "
+                              " ",
                             )}
                           </div>
                         )}
