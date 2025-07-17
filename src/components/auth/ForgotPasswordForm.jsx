@@ -46,8 +46,14 @@ export const ForgotPasswordForm = () => {
           {mutation.isPending ? "Sending..." : "Send Reset Link"}
         </Button>
       </form>
-      <p className="mt-2">
-        Remember your password? <Link to="/">Log In</Link>
+      <p className="mt-2 text-slate-600 dark:text-slate-400">
+        Remember your password?{" "}
+        <Link
+          to="/"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Log In
+        </Link>
       </p>
     </>
   );

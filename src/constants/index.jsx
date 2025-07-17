@@ -38,6 +38,12 @@ export const navbarLinks = [
         icon: Users,
         roles: ["agent"],
       },
+      {
+        path: "qa-agent-dashboard",
+        label: "Dashboard",
+        icon: Users,
+        roles: ["qa-agent"],
+      },
     ],
   },
   {
@@ -64,25 +70,34 @@ export const navbarLinks = [
         path: "home-warranty",
         label: "Home Warranty",
         icon: DollarSign,
-        roles: ["superadmin", "admin", "agent"],
+        roles: ["superadmin", "admin", "agent", "qa-agent"],
       },
       {
         path: "auto-warranty-leads",
         label: "Auto Warranty Leads",
         icon: Briefcase,
-        roles: ["superadmin", "admin", "agent"],
+        roles: ["superadmin", "admin", "agent", "qa-agent"],
       },
       {
         path: "auto-warranty-sales",
         label: "Auto Warranty Sales",
         icon: Megaphone,
-        roles: ["superadmin", "admin", "agent"],
+        roles: ["superadmin", "admin", "agent", "qa-agent"],
       },
     ],
   },
 ];
 
 export const salesColumns = [
+  {
+    key: "saleId",
+    header: "Sale ID",
+    render: (_, sale) => (
+      <span className="font-mono text-xs bg-gray-800 px-2 py-1 rounded">
+        #{sale._id?.slice(-8) || "N/A"}
+      </span>
+    ),
+  },
   { key: "customerName", header: "Customer" },
   { key: "primaryPhone", header: "Primary Phone" },
   { key: "campaignType", header: "Campaign Type" },
@@ -114,9 +129,102 @@ export const salesColumns = [
     header: "Date of Sale",
     render: (value) => (value ? format(new Date(value), "PP") : "-"),
   },
+  {
+    key: "status",
+    header: "Current Status",
+    render: (value, sale) => {
+      const status = sale?.history?.[0]?.status || "pending";
+      const statusStyles = {
+        pending: "bg-yellow-100 text-yellow-800",
+        under_review: "bg-blue-100 text-blue-800",
+        approved: "bg-green-100 text-green-800",
+        rejected: "bg-red-100 text-red-800",
+        requires_revision: "bg-orange-100 text-orange-800",
+        escalated: "bg-purple-100 text-purple-800",
+      };
+      return (
+        <div className="space-y-1">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              statusStyles[status] || "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status.replace("_", " ").toUpperCase()}
+          </span>
+          {sale?.history?.[0]?.history?.[0]?.actionBy?.name && (
+            <div className="text-xs text-gray-500">
+              by{" "}
+              {sale?.history?.[0]?.history?.[0]?.actionBy?.name +
+                "( " +
+                sale?.history?.[0]?.history?.[0]?.actionBy?.role +
+                " )" || "Unknown"}
+            </div>
+          )}
+          {sale?.history?.[0]?.history?.[0]?.timestamp && (
+            <div className="text-xs text-gray-400">
+              {format(
+                new Date(sale?.history?.[0]?.history?.[0]?.timestamp),
+                "MMM dd, HH:mm"
+              )}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    key: "qualityMetrics",
+    header: "Quality & Activity",
+    render: (_, sale) => {
+      const score = sale?.history?.[0]?.history?.[0]?.qualityScore || 0;
+      const scoreColor =
+        score >= 8
+          ? "text-green-600"
+          : score >= 6
+          ? "text-yellow-600"
+          : "text-red-600";
+      const actionsCount = sale?.history?.length || 0;
+      const commentsCount = sale?.history?.length || 0;
+      return (
+        <div className="space-y-1 text-sm">
+          <div className={`font-medium ${scoreColor}`}>
+            Score: {score > 0 ? `${score}/10` : "Not Rated"}
+          </div>
+          <div className="flex space-x-2">
+            <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">
+              {actionsCount} action{actionsCount !== 1 ? "s" : ""}
+            </span>
+            <span className="text-xs bg-green-100 text-green-800 px-1 rounded">
+              {commentsCount} comment{commentsCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <span
+            className={`text-xs px-1 rounded ${
+              sale.priority === "high"
+                ? "bg-red-100 text-red-800"
+                : sale.priority === "medium"
+                ? "bg-yellow-100 text-yellow-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {sale?.priority?.toUpperCase() || "NORMAL"} PRIORITY
+          </span>
+        </div>
+      );
+    },
+  },
 ];
 
 export const autoWarrantySalesColumns = [
+  {
+    key: "saleId",
+    header: "Sale ID",
+    render: (_, sale) => (
+      <span className="font-mono text-xs bg-gray-800 px-2 py-1 rounded">
+        #{sale._id?.slice(-8) || "N/A"}
+      </span>
+    ),
+  },
   { key: "customerName", header: "Customer" },
   { key: "primaryPhone", header: "Primary Phone" },
   { key: "vinNumber", header: "VIN Number" },
@@ -195,9 +303,102 @@ export const autoWarrantySalesColumns = [
     header: "Date of Sale",
     render: (value) => (value ? format(new Date(value), "PP") : "-"),
   },
+  {
+    key: "status",
+    header: "Current Status",
+    render: (value, sale) => {
+      const status = sale?.history?.[0]?.status || "pending";
+      const statusStyles = {
+        pending: "bg-yellow-100 text-yellow-800",
+        under_review: "bg-blue-100 text-blue-800",
+        approved: "bg-green-100 text-green-800",
+        rejected: "bg-red-100 text-red-800",
+        requires_revision: "bg-orange-100 text-orange-800",
+        escalated: "bg-purple-100 text-purple-800",
+      };
+      return (
+        <div className="space-y-1">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              statusStyles[status] || "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status.replace("_", " ").toUpperCase()}
+          </span>
+          {sale?.history?.[0]?.history?.[0]?.actionBy?.name && (
+            <div className="text-xs text-gray-500">
+              by{" "}
+              {sale?.history?.[0]?.history?.[0]?.actionBy?.name +
+                "( " +
+                sale?.history?.[0]?.history?.[0]?.actionBy?.role +
+                " )" || "Unknown"}
+            </div>
+          )}
+          {sale?.history?.[0]?.history?.[0]?.timestamp && (
+            <div className="text-xs text-gray-400">
+              {format(
+                new Date(sale?.history?.[0]?.history?.[0]?.timestamp),
+                "MMM dd, HH:mm"
+              )}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    key: "qualityMetrics",
+    header: "Quality & Activity",
+    render: (_, sale) => {
+      const score = sale?.history?.[0]?.history?.[0]?.qualityScore || 0;
+      const scoreColor =
+        score >= 8
+          ? "text-green-600"
+          : score >= 6
+          ? "text-yellow-600"
+          : "text-red-600";
+      const actionsCount = sale?.history?.length || 0;
+      const commentsCount = sale?.history?.length || 0;
+      return (
+        <div className="space-y-1 text-sm">
+          <div className={`font-medium ${scoreColor}`}>
+            Score: {score > 0 ? `${score}/10` : "Not Rated"}
+          </div>
+          <div className="flex space-x-2">
+            <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">
+              {actionsCount} action{actionsCount !== 1 ? "s" : ""}
+            </span>
+            <span className="text-xs bg-green-100 text-green-800 px-1 rounded">
+              {commentsCount} comment{commentsCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <span
+            className={`text-xs px-1 rounded ${
+              sale.priority === "high"
+                ? "bg-red-100 text-red-800"
+                : sale.priority === "medium"
+                ? "bg-yellow-100 text-yellow-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {sale?.priority?.toUpperCase() || "NORMAL"} PRIORITY
+          </span>
+        </div>
+      );
+    },
+  },
 ];
 
 export const leadColumns = [
+  {
+    key: "leadId",
+    header: "Lead ID",
+    render: (_, lead) => (
+      <span className="font-mono text-xs bg-gray-800 px-2 py-1 rounded">
+        #{lead._id?.slice(-8) || "N/A"}
+      </span>
+    ),
+  },
   {
     key: "dateOfSale",
     header: "Date of Sale",
@@ -205,32 +406,206 @@ export const leadColumns = [
   },
   { key: "customerName", header: "Customer Name" },
   {
-    key: "agentName",
-    header: "Agent",
-    render: (_, lead) => lead.agent?.name || lead.agentName || "-",
+    key: "agentInfo",
+    header: "Agent Details",
+    render: (_, lead) => {
+      const agent = lead.agent || {};
+      const agentName = agent.name || lead.agentName || "Unknown";
+      const agentRole = agent.role || "agent";
+      const agentId = agent._id || agent.id || "N/A";
+      return (
+        <div className="space-y-1">
+          <div className="font-medium text-sm">{agentName}</div>
+          <div className="flex items-center space-x-2">
+            <span
+              className={`px-2 py-1 rounded-full text-xs font-medium ${
+                agentRole === "agent"
+                  ? "bg-blue-100 text-blue-800"
+                  : agentRole === "senior-agent"
+                  ? "bg-purple-100 text-purple-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {agentRole.toUpperCase()}
+            </span>
+            <span className="text-xs text-gray-500 font-mono">
+              #{agentId.slice(-6)}
+            </span>
+          </div>
+        </div>
+      );
+    },
   },
-  { key: "primaryPhone", header: "Primary Phone Number" },
+  { key: "primaryPhone", header: "Primary Phone" },
   {
-    key: "vehicleMileage",
-    header: "Vehicle Mileage",
-    render: (value) => (value ? `${value.toLocaleString()} miles` : "-"),
+    key: "vehicleInfo",
+    header: "Vehicle Details",
+    render: (_, lead) => (
+      <div className="space-y-1 text-sm">
+        <div>
+          <strong>Model:</strong> {lead.vehicleMakeModelVariant || "N/A"}
+        </div>
+        <div>
+          <strong>Mileage:</strong>{" "}
+          {lead.vehicleMileage
+            ? `${lead.vehicleMileage.toLocaleString()} miles`
+            : "N/A"}
+        </div>
+      </div>
+    ),
   },
   {
     key: "extendedWarranty",
-    header: "Extended Warranty Options",
-    render: (value) => value || "-",
+    header: "Warranty Interest",
+    render: (value) => (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value === "yes"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {value === "yes" ? "INTERESTED" : "NOT INTERESTED"}
+      </span>
+    ),
   },
   {
     key: "customerAgreedForTransferToSeniorRepresentative",
-    header: "Agreed to Transfer",
-    render: (value) => (value ? "Yes" : "No"),
+    header: "Transfer Agreement",
+    render: (value) => (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium ${
+          value === "yes"
+            ? "bg-green-100 text-green-800"
+            : "bg-red-100 text-red-800"
+        }`}
+      >
+        {value === "yes" ? "AGREED" : "DECLINED"}
+      </span>
+    ),
   },
-  { key: "email", header: "Email", render: (value) => value || "-" },
   {
-    key: "vehicleMakeModelVariant",
-    header: "Vehicle Make Model & Variant",
-    render: (value) => value || "-",
+    key: "contactInfo",
+    header: "Contact Details",
+    render: (_, lead) => (
+      <div className="space-y-1 text-sm">
+        <div>
+          <strong>Email:</strong> {lead.email || "N/A"}
+        </div>
+        <div>
+          <strong>Address:</strong>{" "}
+          {lead.address ? lead.address.substring(0, 25) + "..." : "N/A"}
+        </div>
+      </div>
+    ),
   },
-  { key: "address", header: "Address", render: (value) => value || "-" },
-  { key: "dialerName", header: "Dialer", render: (value) => value || "-" },
+  {
+    key: "systemInfo",
+    header: "System Details",
+    render: (_, lead) => (
+      <div className="space-y-1 text-sm">
+        <div>
+          <strong>Dialer:</strong> {lead.dialerName || "N/A"}
+        </div>
+        <div>
+          <strong>Created:</strong>{" "}
+          {lead.createdAt
+            ? format(new Date(lead.createdAt), "MMM dd, yyyy")
+            : "N/A"}
+        </div>
+        <div>
+          <strong>Source:</strong> {lead.source || "Web Form"}
+        </div>
+      </div>
+    ),
+  },
+  {
+    key: "status",
+    header: "Current Status",
+    render: (value, lead) => {
+      const status = lead?.history?.[0]?.status || "pending";
+      const statusStyles = {
+        pending: "bg-yellow-100 text-yellow-800",
+        under_review: "bg-blue-100 text-blue-800",
+        approved: "bg-green-100 text-green-800",
+        rejected: "bg-red-100 text-red-800",
+        requires_revision: "bg-orange-100 text-orange-800",
+        escalated: "bg-purple-100 text-purple-800",
+      };
+      return (
+        <div className="space-y-1">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              statusStyles[status] || "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {status.replace("_", " ").toUpperCase()}
+          </span>
+          {lead?.history?.[0]?.history?.[0].actionBy?.name && (
+            <div className="text-xs text-gray-100">
+              by{" "}
+              {lead?.history?.[0]?.history?.[0].actionBy?.name +
+                "( " +
+                lead?.history?.[0]?.history?.[0].actionBy?.role +
+                " )" || "Unknown"}
+            </div>
+          )}
+          {lead?.history?.[0]?.history?.[0].timestamp && (
+            <div className="text-xs text-gray-400">
+              {format(
+                new Date(lead?.history?.[0]?.history?.[0].timestamp),
+                "MMM dd, HH:mm"
+              )}
+            </div>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    key: "qualityMetrics",
+    header: "Quality & Activity",
+    render: (_, lead) => {
+      const score = lead?.history?.[0]?.history?.[0]?.qualityScore || 0;
+      // const comments = [];
+      // lead?.history?.forEach((element) => {
+      //   comments?.push(element?.comments?.[0]);
+      // });
+
+      const scoreColor =
+        score >= 8
+          ? "text-green-600"
+          : score >= 6
+          ? "text-yellow-600"
+          : "text-red-600";
+      const actionsCount = lead?.history?.length || 0;
+      const commentsCount = lead?.history?.length || 0;
+      return (
+        <div className="space-y-1 text-sm">
+          <div className={`font-medium ${scoreColor}`}>
+            Score: {score > 0 ? `${score}/10` : "Not Rated"}
+          </div>
+          <div className="flex space-x-2">
+            <span className="text-xs bg-blue-100 text-blue-800 px-1 rounded">
+              {actionsCount} action{actionsCount !== 1 ? "s" : ""}
+            </span>
+            <span className="text-xs bg-green-100 text-green-800 px-1 rounded">
+              {commentsCount} comment{commentsCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <span
+            className={`text-xs px-1 rounded ${
+              lead.priority === "high"
+                ? "bg-red-100 text-red-800"
+                : lead.priority === "medium"
+                ? "bg-yellow-100 text-yellow-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {lead?.priority?.toUpperCase() || "NORMAL"} PRIORITY
+          </span>
+        </div>
+      );
+    },
+  },
 ];

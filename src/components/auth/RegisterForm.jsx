@@ -45,10 +45,10 @@ export const RegisterForm = ({ isProtected, defaultRole }) => {
   const availableRoles = defaultRole
     ? [defaultRole]
     : isProtected
-    ? user?.role === "superadmin"
-      ? ["admin", "agent"]
-      : ["agent"]
-    : ["superadmin", "agent"];
+      ? user?.role === "superadmin"
+        ? ["admin", "agent"]
+        : ["agent"]
+      : ["superadmin", "agent", "qa-agent"];
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -104,10 +104,12 @@ export const RegisterForm = ({ isProtected, defaultRole }) => {
         )}
       </div> */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Role</label>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Role
+        </label>
         <select
           {...register("role", { required: "Role is required" })}
-          className="mt-1 p-2 w-full border rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 p-2 w-full border rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
           disabled={!!defaultRole}
         >
           {availableRoles.map((role) => (
@@ -117,11 +119,19 @@ export const RegisterForm = ({ isProtected, defaultRole }) => {
           ))}
         </select>
         {errors.role && (
-          <p className="mt-1 text-sm text-red-500">{errors.role.message}</p>
+          <p className="mt-1 text-sm text-red-500 dark:text-red-400">
+            {errors.role.message}
+          </p>
         )}
       </div>
-      <p>
-        Already have an account? <Link to="/">Login</Link>
+      <p className="text-slate-600 dark:text-slate-400">
+        Already have an account?{" "}
+        <Link
+          to="/"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Login
+        </Link>
       </p>
       <Button type="submit" disabled={mutation.isPending}>
         {mutation.isPending ? "Registering..." : "Register"}

@@ -7,19 +7,19 @@ export const Table = ({ columns, data, actions, rowKey = "_id" }) => {
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-200">
+      <table className="min-w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors">
         <thead>
-          <tr className="bg-gray-50">
+          <tr className="bg-slate-50 dark:bg-slate-700">
             {columns.map((column) => (
               <th
                 key={column.key}
-                className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 min-w-[200px]"
+                className="py-2 px-4 border-b border-slate-200 dark:border-slate-600 text-left text-sm font-semibold text-slate-700 dark:text-slate-300 min-w-[200px]"
               >
                 {column.header}
               </th>
             ))}
             {actions && (
-              <th className="py-2 px-4 border-b text-left text-sm font-semibold text-gray-700 min-w-[150px]">
+              <th className="py-2 px-4 border-b border-slate-200 dark:border-slate-600 text-left text-sm font-semibold text-slate-700 dark:text-slate-300 min-w-[150px]">
                 Actions
               </th>
             )}
@@ -28,11 +28,14 @@ export const Table = ({ columns, data, actions, rowKey = "_id" }) => {
         <tbody>
           {data && data.length > 0 ? (
             data.map((item) => (
-              <tr key={getRowKey(item)} className="hover:bg-gray-50">
+              <tr
+                key={getRowKey(item)}
+                className="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className="py-2 px-4 border-b text-sm text-gray-900"
+                    className="py-2 px-4 border-b border-slate-200 dark:border-slate-600 text-sm text-slate-900 dark:text-slate-100"
                   >
                     {column.render
                       ? column.render(item[column.key], item)
@@ -40,7 +43,7 @@ export const Table = ({ columns, data, actions, rowKey = "_id" }) => {
                   </td>
                 ))}
                 {actions && (
-                  <td className="py-2 px-4 border-b text-sm text-gray-900">
+                  <td className="py-2 px-4 border-b border-slate-200 dark:border-slate-600 text-sm text-slate-900 dark:text-slate-100">
                     {actions(item)}
                   </td>
                 )}
@@ -50,7 +53,7 @@ export const Table = ({ columns, data, actions, rowKey = "_id" }) => {
             <tr>
               <td
                 colSpan={columns.length + (actions ? 1 : 0)}
-                className="py-2 px-4 text-center text-sm text-gray-500"
+                className="py-2 px-4 text-center text-sm text-slate-500 dark:text-slate-400"
               >
                 No data available
               </td>

@@ -25,3 +25,42 @@ export const exportAutoSalesCSV = async () => {
   });
   return response.data;
 };
+
+export const passSale = async ({ id, payload }) => {
+  const response = await axiosInstance.patch(`/auto-sales/${id}/pass`, payload);
+  return response.data;
+};
+
+export const rejectSale = async ({ id, payload }) => {
+  const response = await axiosInstance.patch(
+    `/auto-sales/${id}/reject`,
+    payload,
+  );
+  return response.data;
+};
+
+export const getAutoSaleHistory = async (id) => {
+  const response = await axiosInstance.get(`/sale-history/${id}/history`);
+  return response.data;
+};
+
+export const addAutoSaleHistory = async ({ payload }) => {
+  const response = await axiosInstance.post(`/sale-history/history`, payload);
+  return response.data;
+};
+
+export const addAutoSaleHistoryComment = async ({ id, payload }) => {
+  const response = await axiosInstance.post(
+    `/sale-history/${id}/comments`,
+    payload,
+  );
+  return response.data;
+};
+
+export const updateSaleHistoryStatus = async ({ id, payload }) => {
+  const response = await axiosInstance.patch(
+    `/sale-history/${id}/status`,
+    payload,
+  );
+  return response.data;
+};

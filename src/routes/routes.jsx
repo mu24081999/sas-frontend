@@ -17,6 +17,7 @@ import { AutoWarrantySales } from "../pages/campaigns/auto-warranty-sales";
 import { EditForm } from "../components/common/EditForm";
 import SuperadminDashboard from "../pages/dashboard/SuperadminDashboard";
 import AgentDetails from "../pages/dashboard/AgentDetails";
+import QaDashboard from "../pages/dashboard/QaDashboard";
 
 export const router = createBrowserRouter([
   {
@@ -62,10 +63,17 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={["agent"]} />,
         children: [{ path: "agent-dashboard", element: <AgentDashboard /> }],
       },
+      // QA Dashboard
+      {
+        element: <ProtectedRoute allowedRoles={["qa-agent"]} />,
+        children: [{ path: "qa-agent-dashboard", element: <QaDashboard /> }],
+      },
       // Routes accessible to all roles
       {
         element: (
-          <ProtectedRoute allowedRoles={["superadmin", "admin", "agent"]} />
+          <ProtectedRoute
+            allowedRoles={["superadmin", "admin", "agent", "qa-agent"]}
+          />
         ),
         children: [
           { path: "home-warranty", element: <Sales /> },

@@ -91,13 +91,13 @@ export const EditForm = () => {
           ? isAutoWarranty
             ? "/auto-warranty-sales"
             : "/home-warranty"
-          : "/auto-warranty-leads"
+          : "/auto-warranty-leads",
       );
     },
     onError: (error) => {
       toast.error(
         error.response?.data?.msg ||
-          `Failed to update ${isSale ? "sale" : "lead"}`
+          `Failed to update ${isSale ? "sale" : "lead"}`,
       );
     },
   });
@@ -125,7 +125,7 @@ export const EditForm = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 max-w-2xl mx-auto p-6"
     >
-      <h2 className="text-2xl font-bold mb-4">
+      <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">
         Edit{" "}
         {isSale
           ? isAutoWarranty
@@ -137,19 +137,19 @@ export const EditForm = () => {
       {isSale && (
         <>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
               Campaign
             </label>
             <select
               {...register("campaign", { required: "Campaign is required" })}
-              className="mt-1 p-2 w-full border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 p-2 w-full border rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
               disabled
             >
               <option value="Home Warranty">Home Warranty</option>
               <option value="Auto Warranty">Auto Warranty</option>
             </select>
             {errors.campaign && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                 {errors.campaign.message}
               </p>
             )}
@@ -243,7 +243,7 @@ export const EditForm = () => {
                   {...register("planDuration", {
                     required: "Plan duration is required",
                   })}
-                  className="mt-1 p-2 w-full border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                className="mt-1 p-2 w-full border rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
                 >
                   <option value="">Select duration</option>
                   <option value="1 Year">1 Year</option>
@@ -252,7 +252,7 @@ export const EditForm = () => {
                   <option value="5 Years">5 Years</option>
                 </select> */}
                 {errors.planName && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                     {errors.planName.message}
                   </p>
                 )}
@@ -295,20 +295,20 @@ export const EditForm = () => {
             error={errors.activationFee?.message}
           />
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
               Payment Mode
             </label>
             <select
               {...register("paymentMode", {
                 required: "Payment mode is required",
               })}
-              className="mt-1 p-2 w-full border rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 p-2 w-full border rounded-md bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-slate-300 dark:border-slate-600 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"
             >
               <option value="Credit Card">Credit Card</option>
               <option value="Cheque Book">Cheque Book</option>
             </select>
             {errors.paymentMode && (
-              <p className="mt-1 text-sm text-red-500">
+              <p className="mt-1 text-sm text-red-500 dark:text-red-400">
                 {errors.paymentMode.message}
               </p>
             )}
@@ -432,7 +432,7 @@ export const EditForm = () => {
                 ? isAutoWarranty
                   ? "/auto-warranty-sales"
                   : "/home-warranty"
-                : "/auto-warranty-leads"
+                : "/auto-warranty-leads",
             )
           }
           disabled={mutation.isPending}

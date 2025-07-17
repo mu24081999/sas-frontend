@@ -55,11 +55,23 @@ export const LoginForm = () => {
         {...register("password", { required: "Password is required" })}
         error={errors.password?.message}
       />
-      <p>
-        Not have an account? <Link to="/public-register">Create one</Link>
+      <p className="text-slate-600 dark:text-slate-400">
+        Not have an account?{" "}
+        <Link
+          to="/public-register"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Create one
+        </Link>
       </p>
-      <p>
-        Forgot your password? <Link to="/forgot-password">Reset Password</Link>
+      <p className="text-slate-600 dark:text-slate-400">
+        Forgot your password?{" "}
+        <Link
+          to="/forgot-password"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Reset Password
+        </Link>
       </p>
       <Button type="submit" disabled={mutation.isPending}>
         {mutation.isPending ? "Logging in..." : "Login"}

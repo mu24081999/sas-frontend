@@ -49,8 +49,13 @@ export const ResetPasswordForm = () => {
           {mutation.isPending ? "Resetting..." : "Reset Password"}
         </Button>
       </form>
-      <p className="mt-4 text-right text-sm text-gray-600">
-        <Link to="/">Back to Login</Link>
+      <p className="mt-4 text-right text-sm text-slate-600 dark:text-slate-400">
+        <Link
+          to="/"
+          className="text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Back to Login
+        </Link>
       </p>
     </>
   );

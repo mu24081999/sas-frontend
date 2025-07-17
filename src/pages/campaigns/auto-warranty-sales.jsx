@@ -15,13 +15,27 @@ import { Table } from "../../components/common/Table";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DeleteModal } from "../../components/common/DeleteModal";
+import { PassModal } from "../../components/common/PassModal";
+import { RejectModal } from "../../components/common/RejectModal";
+import { AutoSaleHistoryModal } from "../../components/common/AutoSaleHistoryModal";
 import { Select } from "../../components/common/Select";
 import { autoWarrantySalesColumns } from "../../constants";
 import useAuth from "../../hooks/useAuth";
+import {
+  passSale,
+  rejectSale,
+  updateSaleHistoryStatus,
+} from "../../api/autoSaleApi";
 
 export const AutoWarrantySales = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [saleToDelete, setSaleToDelete] = useState(null);
+  const [passModalOpen, setPassModalOpen] = useState(false);
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
+  const [saleToPass, setSaleToPass] = useState(null);
+  const [saleToReject, setSaleToReject] = useState(null);
+  const [selectedSale, setSelectedSale] = useState(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -46,7 +60,7 @@ export const AutoWarrantySales = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["auto-sales"],
     queryFn: getAutoSales,
-    enabled: ["admin", "superadmin"].includes(user.role),
+    enabled: ["admin", "superadmin", "qa-agent"].includes(user.role),
   });
 
   const onSubmit = (data) => {
@@ -55,13 +69,50 @@ export const AutoWarrantySales = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteAutoSale,
     onSuccess: () => {
-      queryClient.invalidateQueries(["sales"]);
+      queryClient.invalidateQueries(["auto-sales"]);
       toast.success("Sale deleted successfully!");
       setDeleteModalOpen(false);
       setSaleToDelete(null);
     },
     onError: (error) => {
       toast.error(error.response?.data?.msg || "Failed to delete sale");
+    },
+  });
+
+  const passMutation = useMutation({
+    mutationFn: passSale,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["auto-sales"]);
+      toast.success("Sale approved successfully!");
+      setPassModalOpen(false);
+      setSaleToPass(null);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.msg || "Failed to approve sale");
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: rejectSale,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["auto-sales"]);
+      toast.success("Sale rejected successfully!");
+      setRejectModalOpen(false);
+      setSaleToReject(null);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.msg || "Failed to reject sale");
+    },
+  });
+
+  const statusUpdateMutation = useMutation({
+    mutationFn: updateSaleHistoryStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["auto-sales"]);
+      toast.success("Sale status updated successfully!");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.msg || "Failed to update sale status");
     },
   });
 
@@ -76,9 +127,36 @@ export const AutoWarrantySales = () => {
     setDeleteModalOpen(true);
   };
 
+  const handlePassSale = (sale) => {
+    setSaleToPass(sale);
+    setPassModalOpen(true);
+  };
+
+  const handleRejectSale = (sale) => {
+    setSaleToReject(sale);
+    setRejectModalOpen(true);
+  };
+
+  const handleViewHistory = (sale) => {
+    setSelectedSale(sale);
+    setHistoryModalOpen(true);
+  };
+
   const confirmDelete = () => {
     if (saleToDelete) {
       deleteMutation.mutate(saleToDelete._id);
+    }
+  };
+
+  const confirmPass = (formData) => {
+    if (saleToPass) {
+      passMutation.mutate({ id: saleToPass._id, payload: formData });
+    }
+  };
+
+  const confirmReject = (formData) => {
+    if (saleToReject) {
+      rejectMutation.mutate({ id: saleToReject._id, payload: formData });
     }
   };
 
@@ -116,24 +194,45 @@ export const AutoWarrantySales = () => {
     }
   };
 
-  const renderActions = (sale) => (
-    <div className="flex space-x-2">
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={() => handleEditSale(sale)}
-      >
-        Edit
-      </Button>
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={() => handleDeleteSale(sale)}
-      >
-        Delete
-      </Button>
-    </div>
-  );
+  const renderActions = (sale) => {
+    const currentStatus = sale?.history?.[0]?.status || "pending";
+    const canApprove = ["admin", "superadmin", "qa-agent"].includes(user?.role);
+    const canEdit = ["admin", "superadmin"].includes(user?.role);
+
+    return (
+      <div className="flex space-x-1 flex-wrap gap-1 min-w-sm">
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => handleViewHistory(sale)}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          QA History
+        </Button>
+
+        {canEdit && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => handleEditSale(sale)}
+          >
+            Edit
+          </Button>
+        )}
+
+        {canEdit && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => handleDeleteSale(sale)}
+            className="bg-gray-600 hover:bg-gray-700"
+          >
+            Delete
+          </Button>
+        )}
+      </div>
+    );
+  };
   return (
     <div className="p-6">
       <div className="flex justify-between items-center">
@@ -344,7 +443,7 @@ export const AutoWarrantySales = () => {
                 columns={autoWarrantySalesColumns}
                 data={data?.sales || []}
                 actions={
-                  ["admin", "superadmin"].includes(user?.role)
+                  ["admin", "superadmin", "qa-agent"].includes(user?.role)
                     ? renderActions
                     : null
                 }
@@ -361,6 +460,28 @@ export const AutoWarrantySales = () => {
             isPending={deleteMutation.isPending}
             entityName="Sale"
             entityIdentifier={saleToDelete?.customerName}
+          />
+          <PassModal
+            isOpen={passModalOpen}
+            onClose={() => setPassModalOpen(false)}
+            onConfirm={confirmPass}
+            isPending={passMutation.isPending}
+            entityName="Sale"
+            entityIdentifier={saleToPass?.customerName}
+          />
+          <RejectModal
+            isOpen={rejectModalOpen}
+            onClose={() => setRejectModalOpen(false)}
+            onConfirm={confirmReject}
+            isPending={rejectMutation.isPending}
+            entityName="Sale"
+            entityIdentifier={saleToReject?.customerName}
+          />
+          <AutoSaleHistoryModal
+            isOpen={historyModalOpen}
+            onClose={() => setHistoryModalOpen(false)}
+            saleId={selectedSale?._id}
+            saleIdentifier={selectedSale?.customerName}
           />
         </div>
       )}

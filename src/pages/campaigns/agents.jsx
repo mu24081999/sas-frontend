@@ -117,7 +117,7 @@ export const Agents = () => {
             columns={agentColumns}
             data={data?.agents || []}
             actions={
-              ["admin", "superadmin"].includes(user?.role)
+              ["admin", "superadmin", "qa-agent"].includes(user?.role)
                 ? renderActions
                 : null
             }
